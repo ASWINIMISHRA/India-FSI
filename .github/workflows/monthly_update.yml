@@ -1,0 +1,39 @@
+name: Monthly India-FSI Update Pipeline
+
+on:
+  schedule:
+    # Runs at 06:00 UTC on the 2nd day of every month
+    - cron: '0 6 2 * *'
+  # Allows you to test it manually via the GitHub "Run workflow" button
+  workflow_dispatch:
+
+jobs:
+  update-index:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Allows the action to commit updated data back to repo
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Execute India-FSI Pipeline
+        run: python update_fsi.py
+
+      - name: Commit and Push Updated Data
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/India_FSI_Monthly.csv data/India_FSI_Headline_Figure.png
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update India-FSI: $(date +'%B %Y')" && git push)

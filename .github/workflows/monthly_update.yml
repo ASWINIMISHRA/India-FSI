@@ -31,7 +31,7 @@ jobs:
       - name: Execute India-FSI Pipeline
         run: python update_fsi.py
 
-      - name: Commit and Push Updated Data
+      - name: Commit and Push Updated Montly Data
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
